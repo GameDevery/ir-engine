@@ -45,7 +45,7 @@ const MetabaseTab = forwardRef(({ open }: { open: boolean }, ref: React.MutableR
   const siteUrl = useHookstate('')
   const secretKey = useHookstate('')
   const environment = useHookstate('')
-  const expiration = useHookstate(10)
+  const expiration = useHookstate('10')
   const crashDashboardId = useHookstate('')
   const metabaseSettingMutation = useMutation(engineSettingPath)
 
@@ -59,7 +59,7 @@ const MetabaseTab = forwardRef(({ open }: { open: boolean }, ref: React.MutableR
   const secretValue = engineSettings.find((el) => el.key === EngineSettings.Metabase.SecretKey)?.value || ''
   const siteUrlValue = engineSettings.find((el) => el.key === EngineSettings.Metabase.SiteUrl)?.value || ''
   const environmentValue = engineSettings.find((el) => el.key === EngineSettings.Metabase.Environment)?.value || ''
-  const expirationValue = engineSettings.find((el) => el.key === EngineSettings.Metabase.Expiration)?.value || 10
+  const expirationValue = engineSettings.find((el) => el.key === EngineSettings.Metabase.Expiration)?.value || '10'
   const crashDashboardIdValue =
     engineSettings.find((el) => el.key === EngineSettings.Metabase.CrashDashboardId)?.value || ''
 
@@ -68,7 +68,7 @@ const MetabaseTab = forwardRef(({ open }: { open: boolean }, ref: React.MutableR
       siteUrl.set(siteUrlValue)
       secretKey.set(secretValue)
       environment.set(environmentValue)
-      expiration.set(Number(expirationValue))
+      expiration.set(expirationValue)
       crashDashboardId.set(crashDashboardIdValue)
     }
   }, [engineSettings])
@@ -129,7 +129,7 @@ const MetabaseTab = forwardRef(({ open }: { open: boolean }, ref: React.MutableR
       siteUrl.set(siteUrlValue)
       secretKey.set(secretValue)
       environment.set(environmentValue)
-      expiration.set(Number(expirationValue))
+      expiration.set(expirationValue)
       crashDashboardId.set(crashDashboardIdValue)
     }
   }
@@ -170,7 +170,7 @@ const MetabaseTab = forwardRef(({ open }: { open: boolean }, ref: React.MutableR
           type="number"
           label={t('admin:components.setting.metabase.expiration')}
           value={expiration?.value || 10}
-          onChange={(e) => expiration.set(isNaN(parseInt(e.target.value)) ? 10 : parseInt(e.target.value))}
+          onChange={(e) => expiration.set(e.target.value)}
         />
 
         <Input
