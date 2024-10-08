@@ -49,29 +49,29 @@ const MetabaseTab = forwardRef(({ open }: { open: boolean }, ref: React.MutableR
   const crashDashboardId = useHookstate('')
   const metabaseSettingMutation = useMutation(engineSettingPath)
 
-  const metaBaseSettings = useFind(engineSettingPath, {
+  const engineSettings = useFind(engineSettingPath, {
     query: {
       category: 'metabase',
       paginate: false
     }
   }).data
 
-  const secretValue = metaBaseSettings.find((el) => el.key === EngineSettings.Metabase.SecretKey)?.value || ''
-  const siteUrlValue = metaBaseSettings.find((el) => el.key === EngineSettings.Metabase.SiteUrl)?.value || ''
-  const environmentValue = metaBaseSettings.find((el) => el.key === EngineSettings.Metabase.Environment)?.value || ''
-  const expirationValue = metaBaseSettings.find((el) => el.key === EngineSettings.Metabase.Expiration)?.value || 10
+  const secretValue = engineSettings.find((el) => el.key === EngineSettings.Metabase.SecretKey)?.value || ''
+  const siteUrlValue = engineSettings.find((el) => el.key === EngineSettings.Metabase.SiteUrl)?.value || ''
+  const environmentValue = engineSettings.find((el) => el.key === EngineSettings.Metabase.Environment)?.value || ''
+  const expirationValue = engineSettings.find((el) => el.key === EngineSettings.Metabase.Expiration)?.value || 10
   const crashDashboardIdValue =
-    metaBaseSettings.find((el) => el.key === EngineSettings.Metabase.CrashDashboardId)?.value || ''
+    engineSettings.find((el) => el.key === EngineSettings.Metabase.CrashDashboardId)?.value || ''
 
   useEffect(() => {
-    if (metaBaseSettings.length) {
+    if (engineSettings.length) {
       siteUrl.set(siteUrlValue)
       secretKey.set(secretValue)
       environment.set(environmentValue)
       expiration.set(Number(expirationValue))
       crashDashboardId.set(crashDashboardIdValue)
     }
-  }, [metaBaseSettings])
+  }, [engineSettings])
 
   const handleSubmit = async (event) => {
     try {
@@ -92,7 +92,7 @@ const MetabaseTab = forwardRef(({ open }: { open: boolean }, ref: React.MutableR
       const operations: Promise<EngineSettingType | EngineSettingType[]>[] = []
 
       Object.values(EngineSettings.Metabase).forEach((key) => {
-        const settingInDb = metaBaseSettings.find((el) => el.key === key)
+        const settingInDb = engineSettings.find((el) => el.key === key)
         if (!settingInDb) {
           createData.push({
             key,
@@ -125,7 +125,7 @@ const MetabaseTab = forwardRef(({ open }: { open: boolean }, ref: React.MutableR
   }
 
   const handleCancel = () => {
-    if (metaBaseSettings.length) {
+    if (engineSettings.length) {
       siteUrl.set(siteUrlValue)
       secretKey.set(secretValue)
       environment.set(environmentValue)
