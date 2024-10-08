@@ -100,7 +100,7 @@ const MetabaseTab = forwardRef(({ open }: { open: boolean }, ref: React.MutableR
             value: setting[key],
             type: 'private'
           })
-        } else {
+        } else if (settingInDb.value !== setting[key]) {
           operations.push(
             metabaseSettingMutation.patch(settingInDb.id, {
               key,
