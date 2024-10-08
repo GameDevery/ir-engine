@@ -25,7 +25,7 @@ Infinite Reality Engine. All Rights Reserved.
 
 import { useFind, useMutation } from '@ir-engine/common'
 import { EngineSettings } from '@ir-engine/common/src/constants/EngineSettings'
-import { EngineSettingType, engineSettingPath } from '@ir-engine/common/src/schema.type.module'
+import { EngineSettingData, EngineSettingType, engineSettingPath } from '@ir-engine/common/src/schema.type.module'
 import { useHookstate } from '@ir-engine/hyperflux'
 import PasswordInput from '@ir-engine/ui/src/components/tailwind/PasswordInput'
 import Accordion from '@ir-engine/ui/src/primitives/tailwind/Accordion'
@@ -73,53 +73,55 @@ const MetabaseTab = forwardRef(({ open }: { open: boolean }, ref: React.MutableR
     }
   }, [metaBaseSettings])
 
-  const handleSubmit = (event) => {
-    event.preventDefault()
+  const handleSubmit = async (event) => {
+    try {
+      event.preventDefault()
 
-    if (!siteUrl.value || !secretKey.value || !environment.value) return
+      if (!siteUrl.value || !secretKey.value || !environment.value) return
 
-    state.loading.set(true)
+      state.loading.set(true)
 
-    const setting = {
-      siteUrl: siteUrl.value,
-      secretKey: secretKey.value,
-      environment: environment.value,
-      crashDashboardId: crashDashboardId.value
-    }
-
-    const createOperations: Promise<EngineSettingType>[] = []
-    const updateOperations: Promise<EngineSettingType>[] = []
-
-    Object.values(EngineSettings.Metabase).forEach((key) => {
-      const settingInDb = metaBaseSettings.find((el) => el.key === key)
-      if (!settingInDb) {
-        createOperations.push(
-          metabaseSettingMutation.create({
-            key,
-            category: 'metabase',
-            value: setting[key],
-            type: 'private'
-          })
-        )
-      } else {
-        updateOperations.push(
-          metabaseSettingMutation.patch(settingInDb.id, {
-            key,
-            category: 'metabase',
-            value: setting[key],
-            type: 'private'
-          })
-        )
+      const setting = {
+        siteUrl: siteUrl.value,
+        secretKey: secretKey.value,
+        environment: environment.value,
+        crashDashboardId: crashDashboardId.value
       }
-    })
 
-    Promise.all([...createOperations, ...updateOperations])
-      .then(() => {
-        state.set({ loading: false, errorMessage: '' })
+      const createData: EngineSettingData[] = []
+      const operations: Promise<EngineSettingType | EngineSettingType[]>[] = []
+
+      Object.values(EngineSettings.Metabase).forEach((key) => {
+        const settingInDb = metaBaseSettings.find((el) => el.key === key)
+        if (!settingInDb) {
+          createData.push({
+            key,
+            category: 'metabase',
+            value: setting[key],
+            type: 'private'
+          })
+        } else {
+          operations.push(
+            metabaseSettingMutation.patch(settingInDb.id, {
+              key,
+              category: 'metabase',
+              value: setting[key],
+              type: 'private'
+            })
+          )
+        }
       })
-      .catch((e) => {
-        state.set({ loading: false, errorMessage: e.message })
-      })
+
+      if (createData.length > 0) {
+        const createOperation = metabaseSettingMutation.create(createData)
+        operations.push(createOperation)
+      }
+
+      await Promise.all(operations)
+      state.set({ loading: false, errorMessage: '' })
+    } catch (e) {
+      state.set({ loading: false, errorMessage: e.message })
+    }
   }
 
   const handleCancel = () => {
