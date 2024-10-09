@@ -22,41 +22,31 @@ Original Code is the Infinite Reality Engine team.
 All portions of the code written by the Infinite Reality Engine team are Copyright © 2021-2023 
 Infinite Reality Engine. All Rights Reserved.
 */
+import { PopoverState } from '@ir-engine/client-core/src/common/services/PopoverState'
+import React from 'react'
+import Modal, { ModalProps } from '../../../primitives/tailwind/Modal'
+import WarningView from '../../../primitives/tailwind/WarningView'
 
-import { redisSettingMethods, redisSettingPath } from '@ir-engine/common/src/schemas/setting/redis-setting.schema'
-
-import { Application } from '../../../declarations'
-import { updateAppConfig } from '../../updateAppConfig'
-import { RedisSettingService } from './redis-setting.class'
-import redisSettingDocs from './redis-setting.docs'
-import hooks from './redis-setting.hooks'
-
-declare module '@ir-engine/common/declarations' {
-  interface ServiceTypes {
-    [redisSettingPath]: RedisSettingService
-  }
+interface WarningDialogProps {
+  title: string
+  description?: string
+  modalProps?: ModalProps
 }
 
-export default (app: Application): void => {
-  const options = {
-    name: redisSettingPath,
-    paginate: app.get('paginate'),
-    Model: app.get('knexClient'),
-    multi: true
-  }
-
-  app.use(redisSettingPath, new RedisSettingService(options), {
-    // A list of all methods this service exposes externally
-    methods: redisSettingMethods,
-    // You can add additional custom events to be sent to clients here
-    events: [],
-    docs: redisSettingDocs
-  })
-
-  const service = app.service(redisSettingPath)
-  service.hooks(hooks)
-
-  service.on('patched', () => {
-    updateAppConfig()
-  })
+const WarningDialog = ({ title, description, modalProps }: WarningDialogProps) => {
+  return (
+    <Modal
+      onClose={PopoverState.hidePopupover}
+      showCloseButton={false}
+      submitButtonDisabled={true}
+      onSubmit={() => PopoverState.hidePopupover()}
+      className="w-[50vw] max-w-2xl bg-yellow-600"
+      hideFooter={true}
+      {...modalProps}
+    >
+      <WarningView title={title} description={description} />
+    </Modal>
+  )
 }
+
+export default WarningDialog

@@ -23,24 +23,8 @@ All portions of the code written by the Infinite Reality Engine team are Copyrig
 Infinite Reality Engine. All Rights Reserved.
 */
 
-import { createSwaggerServiceOptions } from 'feathers-swagger'
+import { HookContext } from '../../declarations'
 
-import {
-  zendeskSettingDataSchema,
-  zendeskSettingPatchSchema,
-  zendeskSettingQuerySchema,
-  zendeskSettingSchema
-} from '@ir-engine/common/src/schemas/setting/zendesk-setting.schema'
-
-export default createSwaggerServiceOptions({
-  schemas: {
-    zendeskSettingDataSchema,
-    zendeskSettingPatchSchema,
-    zendeskSettingQuerySchema,
-    zendeskSettingSchema
-  },
-  docs: {
-    description: 'Zendesk setting service description',
-    securities: ['all']
-  }
-})
+export default (hook: HookContext): boolean => {
+  return !!hook.params.query.action || !!hook.params.actualQuery.action
+}

@@ -23,19 +23,23 @@ All portions of the code written by the Infinite Reality Engine team are Copyrig
 Infinite Reality Engine. All Rights Reserved.
 */
 
-import type { Params } from '@feathersjs/feathers'
-import { KnexAdapterParams, KnexService } from '@feathersjs/knex'
+import { Entity, setComponent } from '@ir-engine/ecs'
+import { addObjectToGroup } from '@ir-engine/spatial/src/renderer/components/GroupComponent'
+import { MeshComponent } from '@ir-engine/spatial/src/renderer/components/MeshComponent'
+import { setObjectLayers } from '@ir-engine/spatial/src/renderer/components/ObjectLayerComponent'
+import { ObjectLayers } from '@ir-engine/spatial/src/renderer/constants/ObjectLayers'
+import { Mesh } from 'three'
+import { proxifyParentChildRelationships } from './loadGLTFModel'
 
-import {
-  RedisSettingData,
-  RedisSettingPatch,
-  RedisSettingQuery,
-  RedisSettingType
-} from '@ir-engine/common/src/schemas/setting/redis-setting.schema'
-
-export interface RedisSettingParams extends KnexAdapterParams<RedisSettingQuery> {}
-
-export class RedisSettingService<
-  T = RedisSettingType,
-  ServiceParams extends Params = RedisSettingParams
-> extends KnexService<RedisSettingType, RedisSettingData, RedisSettingParams, RedisSettingPatch> {}
+/**
+ * Helper function for attaching a mesh to a scene entity
+ * @param entity Entity to attach the mesh to
+ * @param mesh Mesh to attach to the entity
+ * @param objectLayers Object layers to assign to the mesh. Default is [ObjectLayers.Scene]
+ */
+export function addMesh(entity: Entity, mesh: Mesh, objectLayers: number[] = [ObjectLayers.Scene]) {
+  setComponent(entity, MeshComponent, mesh)
+  addObjectToGroup(entity, mesh)
+  proxifyParentChildRelationships(mesh)
+  setObjectLayers(mesh, ...objectLayers)
+}
